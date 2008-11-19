@@ -12,7 +12,8 @@ module TemplateRelation
         :ordering => "ASC",
         :auto_save => true }.update(opts)
 
-      has_many relation_name, :order => "#{options[:order_attribute]} #{options[:ordering]}"
+      order = options[:order_attribute].blank? ? nil : "#{options[:order_attribute]} #{options[:ordering]}"
+      has_many relation_name, :order => order
 
       validates_template_relation relation_name, options
       
@@ -22,11 +23,23 @@ module TemplateRelation
         end
       end
       
+      define_template_relation_setters_and_getters(relation_name, options)
+    end
+    
+    def validates_template_relation(relation_name, options)
+      validate do |record|
+        record.errors.add(relation_name, "must have exactly #{options[:number]} records; current size is #{record.send(relation_name).size}") unless record.send(relation_name).size == options[:number]
+      end
+    end
+    
+    def define_template_relation_setters_and_getters(relation_name, options)
       options[:number].times do |i|
+        # getter
         define_method "#{relation_name.to_s.singularize}_#{i+1}" do
           send(relation_name)[i]
         end
         
+        # setter
         define_method "#{relation_name.to_s.singularize}_#{i+1}=" do |obj|
           if obj.is_a? ActiveRecord::Base
             if !send(relation_name)[i].blank?
@@ -38,13 +51,6 @@ module TemplateRelation
           else
           end
         end
-      end
-      
-    end
-    
-    def validates_template_relation(relation_name, options)
-      validate do |record|
-        record.errors.add(relation_name, "must have exactly #{options[:number]} records; current size is #{record.send(relation_name).size}") unless record.send(relation_name).size == options[:number]
       end
     end
     
