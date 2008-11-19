@@ -1,0 +1,3 @@
+== Template Relations ==
+
+Allows you to specify the number of relations in ActiveRecord association declarations.
