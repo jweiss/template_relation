@@ -1,3 +1,17 @@
-== Template Relations ==
+== Template Relations
 
 Allows you to specify the number of relations in ActiveRecord association declarations.
+
+class User < ActiveRecord::Base
+  template_relation :images, :number => 3
+end
+
+--> A user now must exactly have 3 images or it will not validate
+
+user = User.new
+user.image_1 = Image.new(:name => 'Pic 1')
+user.image_2 = Image.new(:name => 'Pic 2')
+user.image_3 = Image.new(:name => 'Pic 3')
+user.save!
+
+assert_equal 'Pic 3', user.image_3.name
