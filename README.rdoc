@@ -1,6 +1,12 @@
 == Template Relations
 
-Allows you to specify the number of relations in ActiveRecord association declarations.
+Allows you to specify the number of has_many relations in ActiveRecord association declarations.
+
+
+== Usage
+
+1. Install the plugin/gem
+2. Define a template relation instead of a has_many
 
   class User < ActiveRecord::Base
     template_relation :images, :number => 3
@@ -13,5 +19,8 @@ Allows you to specify the number of relations in ActiveRecord association declar
   user.image_2 = Image.new(:name => 'Pic 2')
   user.image_3 = Image.new(:name => 'Pic 3')
   user.save!
+  
+  user.update_attributes(:image_1 => {:name => 'Nice Image'})
 
-assert_equal 'Pic 3', user.image_3.name
+  assert_equal 'Pic 3', user.image_3.name
+  assert_equal 'Nice Image', user.image_1.name
